@@ -1,0 +1,45 @@
+group 'com.sabpaisa.sabpaisa_flutter'
+version '1.1.4'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+        flatDir {
+            dirs 'libs'
+        }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.1'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 31
+
+    defaultConfig {
+        minSdkVersion 21
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+    dependencies {
+        implementation 'io.github.sabpaisaandroid:sabpaisalib:1.0.3'
+        implementation "com.squareup.okhttp3:okhttp:4.9.3"
+        implementation "com.squareup.okio:okio:2.10.0"
+        implementation "com.squareup.retrofit2:retrofit:2.9.0"
+        implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    }
+    namespace = "com.sabpaisa.sabpaisa_flutter"
+}

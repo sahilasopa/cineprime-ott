@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "260972891398",
+    "project_id": "butterfly-ott",
+    "storage_bucket": "butterfly-ott.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:260972891398:android:f9933972b17ad356586287",
+        "android_client_info": {
+          "package_name": "app.cineprimeott.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD--yK6PU6HEgmG_RrRPtB9R-qMubW3w9I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

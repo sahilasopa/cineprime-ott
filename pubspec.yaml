@@ -1,0 +1,132 @@
+name: cineprime
+description: "Cineprime OTT"
+publish_to: 'none'
+version: 3.3.0+37
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+  google_sign_in: ^6.2.1
+  intl_phone_field: ^3.2.0
+  flutter_facebook_auth: ^7.1.1
+  http: ^1.2.1
+  pinput: ^5.0.0
+  flutter_secure_storage: ^9.0.0
+  carousel_slider: ^5.0.0
+  cached_network_image: ^3.3.1
+  intl: ^0.20.1
+  shimmer: ^3.0.0
+  provider: ^6.1.2
+  river_player: ^0.1.3
+  # Pinned: 1.4.5's iOS Swift code doesn't compile against razorpay-pod 1.5.2
+  razorpay_flutter: 1.4.0
+  flutter_native_splash: ^2.4.0
+  webview_flutter: ^4.7.0
+  firebase_crashlytics: ^4.1.5
+  firebase_analytics: ^11.3.5
+  package_info_plus: ^8.1.1
+  in_app_review: ^2.0.10
+  flutter_launcher_icons: ^0.14.1
+  dio: ^5.4.3+1
+  path_provider: ^2.1.3
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  background_downloader: ^9.2.6
+  collection: ^1.18.0
+  video_player: ^2.9.1
+  in_app_purchase: ^3.2.0
+  facebook_app_events: ^0.20.1
+  url_launcher: ^6.3.1
+  flutter_stripe: ^11.0.0
+  font_awesome_flutter: ^11.0.0
+  visibility_detector: ^0.4.0+2
+  get: ^4.6.6
+  dots_indicator: ^4.0.1
+  autoscale_tabbarview: ^1.0.2
+  image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+  device_info_plus: ^11.2.1
+  payu_checkoutpro_flutter: ^1.2.5
+  custom_refresh_indicator: ^4.0.1
+  wakelock_plus: ^1.2.10
+  sign_in_with_apple: ^6.1.4
+  video_js: ^0.1.3
+  share_plus: ^10.1.4
+  app_links: ^6.4.0
+  smart_auth: ^3.2.0
+  web: ^1.1.1
+  app_tracking_transparency: ^2.0.6+1
+  uuid: ^4.5.1
+  glassmorphism: ^3.0.0
+  flutter_svg: ^2.1.0
+  file_picker: ^10.3.6
+  shared_preferences: ^2.2.2
+  flutter_deeplinkly: ^1.6.0
+  speech_to_text: ^7.5.0
+  flutter_cashfree_pg_sdk: ^2.2.10+48
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.9
+
+# dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/cineprime-icon-square.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#07070C"
+  adaptive_icon_foreground: "assets/images/cineprime-icon-square.png"
+  web:
+    generate: true
+    image_path: "assets/images/cineprime-icon-square.png"
+    background_color: "#07070C"
+    theme_color: "#07070C"
+# dart run flutter_native_splash:create
+flutter:
+  assets:
+    - assets/images/
+    - assets/images/icons/
+    - assets/fonts/
+  uses-material-design: true
+  fonts:
+    - family: Mulish
+      fonts:
+        - asset: assets/fonts/Mulish-Regular.ttf
+        - asset: assets/fonts/Mulish-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Mulish-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Mulish-Bold.ttf
+          weight: 700
+
+flutter_native_splash:
+  color: "#05070C"
+  android: true
+  ios: true
+  web: true
+  fullscreen: false
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
+  image: assets/images/splash-android12.png
+  android_12:
+    color: "#05070C"
+    image: assets/images/splash-android12.png
+
+dependency_overrides:
+  river_player:
+    git:
+      url: https://github.com/sahilasopa/river_player.git
+      ref: master
+
+  webview_flutter_android: 4.4.1
+  package_info_plus: ^8.1.1
