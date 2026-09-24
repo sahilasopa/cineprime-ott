@@ -289,13 +289,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                     ),
                     const SizedBox(height: 8),
                     Expanded(
-                      child: _field(
-                        messageController,
-                        'Message',
-                        Icons.chat_bubble_outline_rounded,
-                        expand: true,
-                        action: TextInputAction.done,
-                      ),
+                      child: _messageField(),
                     ),
                     SizedBox(
                       height: 16,
@@ -460,22 +454,71 @@ class _ContactUsPageState extends State<ContactUsPage> {
     );
   }
 
+  Widget _messageField() {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        TextField(
+          controller: messageController,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
+          minLines: null,
+          maxLines: null,
+          expands: true,
+          textAlignVertical: TextAlignVertical.top,
+          cursorColor: AppColors.colorPrimary,
+          style: const TextStyle(
+            fontFamily: AppTheme.fontFamily,
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+          decoration: InputDecoration(
+            isDense: true,
+            filled: true,
+            fillColor: const Color(0xFF0C121C),
+            hintText: 'Message',
+            hintStyle: const TextStyle(
+              fontFamily: AppTheme.fontFamily,
+              color: AppColors.colorHint,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+            contentPadding: const EdgeInsets.fromLTRB(40, 12, 12, 12),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(color: AppColors.colorInputBorder),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(color: AppColors.colorPrimary),
+            ),
+          ),
+        ),
+        const Positioned(
+          left: 12,
+          top: 14,
+          child: IgnorePointer(
+            child: Icon(Icons.chat_bubble_outline_rounded, size: 18, color: AppColors.colorPrimaryLight),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _field(
     TextEditingController controller,
     String hint,
     IconData icon, {
     TextInputType type = TextInputType.text,
-    bool expand = false,
     TextInputAction action = TextInputAction.next,
   }) {
     return TextField(
       controller: controller,
       keyboardType: type,
       textInputAction: action,
-      minLines: expand ? null : 1,
-      maxLines: expand ? null : 1,
-      expands: expand,
-      textAlignVertical: expand ? TextAlignVertical.top : TextAlignVertical.center,
+      minLines: 1,
+      maxLines: 1,
       cursorColor: AppColors.colorPrimary,
       style: const TextStyle(
         fontFamily: AppTheme.fontFamily,
@@ -495,6 +538,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
           fontWeight: FontWeight.w600,
         ),
         prefixIcon: Icon(icon, size: 18, color: AppColors.colorPrimaryLight),
+        prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 40),
         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),

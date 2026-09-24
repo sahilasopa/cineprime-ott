@@ -63,15 +63,19 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
   }
 
   Future<void> _rateMovie() async {
-    if (_rated) return;
     final userId = Provider.of<AuthenticationProvider>(context, listen: false).getUser()?.id;
     if (userId == null || userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sign in to rate this title')));
       return;
     }
-    setState(() => _rated = true);
+    final rated = !_rated;
+    setState(() => _rated = rated);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_ratingKey(userId), true);
+    await prefs.setBool(_ratingKey(userId), rated);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(rated ? 'Rated' : 'Rating removed')),
+    );
   }
 
   void _initPlayer() {
