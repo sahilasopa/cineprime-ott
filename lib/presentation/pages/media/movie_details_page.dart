@@ -20,6 +20,7 @@ import '../../components/ui/app_widgets.dart';
 import '../../custom_controls/custom_controls_widget.dart';
 import 'package:cineprime/video_js_bridge.dart';
 import '../../../platform_utils.dart';
+import '../authentication/login_screen.dart';
 import '../payment/plans_list_page_mobile.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,8 +48,20 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
   @override
   void initState() {
     super.initState();
-    _initPlayer();
+    final signedIn = Provider.of<AuthenticationProvider>(context, listen: false).getUser() != null;
+    if (signedIn) _initPlayer();
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadRating());
+  }
+
+  bool _requireSignIn() {
+    final signedIn = Provider.of<AuthenticationProvider>(context, listen: false).getUser() != null;
+    if (signedIn) return true;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => LoginPage(next: MovieDetailsPage(widget.baseItem)),
+      ),
+    );
+    return false;
   }
 
   String _ratingKey(String userId) => 'cineprime_rated_${userId}_${widget.baseItem.id}';
@@ -149,7 +162,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
             onControlsVisibilityChanged: onControlsVisibilityChanged,
             controlsConfiguration: BetterPlayerControlsConfiguration(),
             data: {
-              "title": widget.baseItem.title,
+              "title": _withoutWatchFullMovie(widget.baseItem.title),
               "genres": widget.baseItem.getClassificationString(),
               "bottom_title": widget.baseItem.getTitleHeaderString(),
               "age_rating": widget.baseItem.ageRating,
@@ -354,6 +367,8 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
     if (isLoggedIn) {
       isSubscribed = authenticationProvider.getUser()!.userSubscription != null;
     }
+    final title = _withoutWatchFullMovie(movie.title);
+    final description = _withoutWatchFullMovie(movie.description);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -418,7 +433,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(movie.title, style: AppTextStyles.displayTitle.copyWith(fontSize: 32)),
+                  Text(title, style: AppTextStyles.displayTitle.copyWith(fontSize: 32)),
                   const SizedBox(height: 6),
                   Text(mediaMetaLine(movie), style: AppTextStyles.meta),
                   const SizedBox(height: 10),
@@ -441,7 +456,10 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                 label: 'Play',
                                 icon: Icons.play_arrow_rounded,
                                 height: 48,
-                                onPressed: _playInLandscape,
+                                onPressed: () {
+                                  if (!_requireSignIn()) return;
+                                  _playInLandscape();
+                                },
                               ),
                       ),
                       const SizedBox(width: 8),
@@ -496,6 +514,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                           icon: Icons.movie_outlined,
                           label: 'Trailer',
                           onPressed: () {
+                            if (!_requireSignIn()) return;
                             setState(() => _detailTab = 2);
                             if (movie.trailerUrl.isNotEmpty && _playingMovie) {
                               _switchPlayback(movie.trailerUrl, playingMovie: false);
@@ -512,26 +531,29 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                         icon: Icons.ios_share_rounded,
                         label: 'Share',
                         onPressed: () {
-                          Share.share(movie.title);
+                          Share.share(title);
                         },
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    movie.description,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: AppColors.colorTextSecondary, height: 1.45, fontSize: 14),
-                  ),
+                  if (description.isNotEmpty)
+                    Text(
+                      description,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: AppColors.colorTextSecondary, height: 1.45, fontSize: 14),
+                    ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       _tabLabel('About', 0),
                       const SizedBox(width: 22),
                       _tabLabel('More Like This', 1),
-                      const SizedBox(width: 22),
-                      _tabLabel('Trailers', 2),
+                      if (movie.trailerUrl.isNotEmpty) ...[
+                        const SizedBox(width: 22),
+                        _tabLabel('Trailers', 2),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -556,8 +578,6 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                         );
                       },
                     ),
-                  if (_detailTab == 2 && movie.trailerUrl.isEmpty)
-                    const Text('No trailers available', style: AppTextStyles.meta),
                   const SizedBox(height: 16),
                 ],
               ),
@@ -635,4 +655,12 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
       ],
     );
   }
+}
+
+String _withoutWatchFullMovie(String value) {
+  return value
+      .replaceAll(RegExp(r'watch\s+full\s+movie', caseSensitive: false), '')
+      .replaceAll(RegExp(r'^[\s|:–—-]+|[\s|:–—-]+$'), '')
+      .replaceAll(RegExp(r'\s{2,}'), ' ')
+      .trim();
 }

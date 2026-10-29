@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cineprime/constants/colors.dart';
 import 'package:cineprime/models/media/media_item.dart';
 import 'package:cineprime/presentation/components/bottom_sheet/media_bottomsheet.dart';
 import 'package:cineprime/presentation/components/media/media_item.dart';
-import 'package:cineprime/presentation/pages/media/trailer_player.dart';
-import 'package:cineprime/presentation/pages/media/trailer_player_web.dart';
 import 'package:shimmer/shimmer.dart';
 
 String _firstLine(String description) {
@@ -30,18 +27,7 @@ class UpcomingItem extends StatelessWidget {
         handleExternalItemTap(baseItem);
         return;
       }
-      if (baseItem.trailerUrl.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Trailer not available')),
-        );
-        return;
-      }
-      final widget =
-          kIsWeb ? TrailerVideoPlayerWeb(baseItem) : TrailerVideoPlayer(baseItem);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => widget),
-      );
+      showBottomSheetOrNavigate(context, baseItem);
     }
 
     final subtitleText = isExternal

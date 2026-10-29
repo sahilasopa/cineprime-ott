@@ -7,7 +7,6 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:cineprime/constants/colors.dart';
 import 'package:cineprime/models/subscription_plan.dart';
 import 'package:cineprime/presentation/components/subscription/plan_card.dart';
-import 'package:cineprime/presentation/components/ui/app_widgets.dart';
 import 'package:cineprime/presentation/pages/payment/payment_success_page.dart';
 import 'package:cineprime/presentation/pages/payment/plans_list_page_shimmer.dart';
 import 'package:cineprime/providers/authentication_provider.dart';
@@ -366,17 +365,8 @@ class _PlansListPageState extends State<PlansListPage> {
     final signedIn = Provider.of<AuthenticationProvider>(context, listen: false).getUser() != null;
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('Subscribe'),
-        elevation: 0,
-      ),
-      body: AppBackground(
-        child: SafeArea(
+      body: SafeArea(
+        child: MembershipPageFrame(
           child: FutureBuilder(
           future: _plansFuture,
           builder: (context, snap) {
@@ -409,46 +399,22 @@ class _PlansListPageState extends State<PlansListPage> {
               );
             }
 
-            return _buildUI(context);
-          },
-        ),
-        ),
-      ),
-    );
-  }
-
-  // ------------------------------------------------------------
-  // UI (Android-style: vertical list of full-width cards)
-  // ------------------------------------------------------------
-  Widget _buildUI(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const PlansPageHeader(),
-          const SizedBox(height: 18),
-          ..._plans.asMap().entries.map((entry) {
-            final index = entry.key;
-            final plan = entry.value;
-            return Padding(
-              padding: EdgeInsets.only(bottom: index < _plans.length - 1 ? 14 : 0),
-              child: PlanCard(
-                plan: plan,
-                isSelected: selectedPlan == plan,
-                onTap: () {
-                  if (!context.mounted) return;
-                  setState(() => selectedPlan = plan);
-                },
-                onSubscribe: () {
-                  if (!context.mounted) return;
-                  setState(() => selectedPlan = plan);
-                  _onPlanPressed(plan);
-                },
-              ),
+            return MembershipBody(
+              plans: _plans,
+              selectedPlan: selectedPlan,
+              onSelect: (plan) {
+                if (!context.mounted) return;
+                setState(() => selectedPlan = plan);
+              },
+              onContinue: () {
+                final plan = selectedPlan;
+                if (plan == null || !context.mounted) return;
+                _onPlanPressed(plan);
+              },
             );
-          }),
-        ],
+          },
+          ),
+        ),
       ),
     );
   }

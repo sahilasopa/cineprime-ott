@@ -18,6 +18,7 @@ import 'package:cineprime/presentation/pages/drawer_pages/legal/terms_and_condit
 import 'package:cineprime/presentation/pages/drawer_pages/legal/refund_policy_page.dart';
 import 'package:cineprime/presentation/pages/drawer_pages/legal/about_us_page.dart';
 import 'package:cineprime/presentation/pages/fragments/my_list_page.dart';
+import 'package:cineprime/presentation/pages/fragments/watch_history_page.dart';
 import 'package:cineprime/presentation/pages/media/downloads_page.dart';
 import 'package:cineprime/presentation/pages/drawer_pages/notifications_page.dart';
 import 'package:cineprime/providers/authentication_provider.dart';
@@ -129,36 +130,25 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('Profile'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AppSettingsPage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
           child: Column(
             children: [
-              Row(
-                children: [
-                  if (Navigator.of(context).canPop())
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: CircleIconButton(
-                        icon: Icons.arrow_back_ios_new_rounded,
-                        size: 40,
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ),
-                  const Text('Profile', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
-                  const Spacer(),
-                  CircleIconButton(
-                    icon: Icons.settings_outlined,
-                    size: 40,
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const AppSettingsPage()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
               Container(
                 width: 92,
                 height: 92,
@@ -267,7 +257,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 icon: Icons.history_rounded,
                 label: 'Watch History',
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MyListPage()));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WatchHistoryPage()));
                 },
               ),
               if (user != null)
@@ -285,42 +275,50 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => NotificationsPage()));
                 },
               ),
-              ProfileMenuTile(
-                icon: Icons.child_care_outlined,
-                label: 'Parental Controls',
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    backgroundColor: AppColors.colorSurface,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                    ),
-                    builder: (_) {
-                      return Consumer<ContentProvider>(
-                        builder: (context, content, __) {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text(
-                                    'Kids Mode',
-                                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
-                                  ),
-                                ),
-                                Switch(
-                                  value: content.showChildSafe,
-                                  activeTrackColor: AppColors.colorPrimary,
-                                  onChanged: (_) => content.toggleSwitch(),
-                                ),
-                              ],
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => contentProvider.toggleSwitch(),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 42,
+                              height: 42,
+                              decoration: const BoxDecoration(
+                                color: AppColors.colorSurfaceElevated,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.child_care_outlined, color: Colors.white, size: 20),
                             ),
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
+                            const SizedBox(width: 14),
+                            const Expanded(
+                              child: Text(
+                                'Parental Controls',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Switch(
+                    value: contentProvider.showChildSafe,
+                    activeThumbColor: AppColors.colorOnGold,
+                    activeTrackColor: AppColors.colorPrimary,
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: AppColors.colorInputBorder,
+                    onChanged: (_) => contentProvider.toggleSwitch(),
+                  ),
+                ],
               ),
               ProfileMenuTile(
                 icon: Icons.help_outline_rounded,

@@ -28,11 +28,6 @@ class MyListPage extends StatelessWidget {
     final contentProvider = Provider.of<ContentProvider>(context);
     final myList = Provider.of<MyListProvider>(context);
     final saved = _resolveItems(contentProvider, myList.ids);
-    final continueWatching = contentProvider
-        .getSections()
-        .where((section) => section.isContinueWatching || section.title.toLowerCase().contains('continue'))
-        .expand((section) => section.baseItems)
-        .toList();
     final upcoming = contentProvider.getUpcoming();
 
     return Scaffold(
@@ -40,7 +35,7 @@ class MyListPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('My List'),
       ),
-      body: saved.isEmpty && continueWatching.isEmpty && upcoming.isEmpty
+      body: saved.isEmpty && upcoming.isEmpty
           ? const EmptyState(
               icon: Icons.bookmark_add_outlined,
               title: 'Your list is empty',
@@ -52,10 +47,6 @@ class MyListPage extends StatelessWidget {
                 if (saved.isNotEmpty) ...[
                   const SectionHeader(title: 'Saved'),
                   for (final item in saved) _TitleCard(item: item),
-                ],
-                if (continueWatching.isNotEmpty) ...[
-                  const SectionHeader(title: 'Continue Watching'),
-                  for (final item in continueWatching) _TitleCard(item: item),
                 ],
                 if (upcoming.isNotEmpty) ...[
                   const SectionHeader(title: 'Coming Soon'),

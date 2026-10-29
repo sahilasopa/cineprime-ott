@@ -65,15 +65,17 @@ void showBottomSheetOrNavigate(BuildContext context, BaseItem baseItem) {
   final isLoggedIn = user != null;
   final hasPlan = user?.userSubscription != null;
 
-  // 1) Unreleased → go straight to trailer (or details for series)
+  // 1) Unreleased → trailer only after sign-in. Guests get the details page.
   if (isFuture) {
-    if (baseItem.mediaType == MediaType.series) {
+    if (baseItem.mediaType == MediaType.series || !isLoggedIn) {
+      final page = baseItem.mediaType == MediaType.series
+          ? TvShowDetailsPage(baseItem)
+          : MovieDetailsPage(baseItem);
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => TvShowDetailsPage(baseItem)),
+        MaterialPageRoute(builder: (_) => page),
       );
     } else {
-      // Use web player on web, native elsewhere
       final widget = kIsWeb
           ? TrailerVideoPlayerWeb(baseItem)
           : TrailerVideoPlayer(baseItem);
@@ -85,12 +87,17 @@ void showBottomSheetOrNavigate(BuildContext context, BaseItem baseItem) {
     return;
   }
 
-  // 2) Not logged in → series can open details (non–login-mandatory); others go to Login
+  // 2) Guests can open film and series details. Playback stays behind sign-in.
   if (!isLoggedIn) {
     if (baseItem.mediaType == MediaType.series) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => TvShowDetailsPage(baseItem)),
+      );
+    } else if (baseItem.mediaType == MediaType.movie) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => MovieDetailsPage(baseItem)),
       );
     } else {
       Navigator.push(

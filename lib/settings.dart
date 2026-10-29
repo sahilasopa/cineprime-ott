@@ -16,7 +16,6 @@ class AppSettingsPage extends StatefulWidget {
 
 class _AppSettingsPageState extends State<AppSettingsPage> {
   bool _notifications = true;
-  bool _backgroundMusic = true;
   bool _wifiOnly = true;
   String _downloadQuality = 'High';
 
@@ -39,12 +38,6 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
             label: 'Notifications From Us',
             value: _notifications,
             onChanged: (value) => setState(() => _notifications = value),
-          ),
-          const SizedBox(height: 10),
-          _SettingsSwitchRow(
-            label: 'Play Background Music',
-            value: _backgroundMusic,
-            onChanged: (value) => setState(() => _backgroundMusic = value),
           ),
           const SizedBox(height: 24),
           const Text('Downloads', style: AppTextStyles.sectionTitle),

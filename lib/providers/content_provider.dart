@@ -8,6 +8,7 @@ import 'package:cineprime/models/media/media_item.dart';
 import 'package:cineprime/models/media/reel_item.dart';
 import 'package:cineprime/models/media/section.dart';
 import 'package:cineprime/network/api_paths.dart';
+import 'package:cineprime/providers/download_provider.dart';
 import 'package:cineprime/services/media_service.dart';
 import 'package:cineprime/services/network_service.dart';
 
@@ -18,6 +19,7 @@ class ContentProvider extends ChangeNotifier {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   bool _showChildSafe = false;
   bool _isToggling = false;
+  bool _reloadQueued = false;
   Future<Map<String, dynamic>>? _loadingFuture;
   Map<String, dynamic> _config = {};
 
@@ -121,17 +123,36 @@ class ContentProvider extends ChangeNotifier {
   }
 
   Future<void> toggleSwitch() async {
-    if (_isToggling) return; // Prevent concurrent toggles
+    _showChildSafe = !_showChildSafe;
+    DownloadProvider.instance.applyChildSafe(_showChildSafe);
+    notifyListeners();
+    try {
+      await storage.write(key: 'show_child_safe', value: _showChildSafe.toString());
+    } catch (_) {}
+    _scheduleChildSafeReload();
+  }
+
+  void _scheduleChildSafeReload() {
+    _reloadQueued = true;
+    if (_isToggling) return;
+    _runChildSafeReload();
+  }
+
+  Future<void> _runChildSafeReload() async {
     _isToggling = true;
     try {
-      _showChildSafe = !showChildSafe;
-      await storage.write(
-          key: 'show_child_safe', value: _showChildSafe.toString());
-      mediaService.init(() {
-        notifyListeners();
-      }, isChildSafe: _showChildSafe);
+      while (_reloadQueued) {
+        _reloadQueued = false;
+        final childSafe = _showChildSafe;
+        await mediaService.init(() {
+          notifyListeners();
+        }, isChildSafe: childSafe);
+      }
     } finally {
       _isToggling = false;
+      if (_reloadQueued) {
+        _runChildSafeReload();
+      }
     }
   }
 

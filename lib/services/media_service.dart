@@ -174,6 +174,7 @@ class MediaService {
         onSuccess();
       }, (error) {
         print("Error fetching section homepage: $error");
+        _status = Status.failed;
       }, () {},
           headers: {
             'Child-Safe': isChildSafe.toString(),
