@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cineprime/constants/colors.dart';
 import 'package:cineprime/models/subscription_plan.dart';
-import 'package:cineprime/presentation/components/subscription/plan_card.dart';
 import 'package:cineprime/presentation/pages/payment/payment_success_page.dart';
 import 'package:cineprime/presentation/pages/payment/plans_list_page_shimmer.dart';
 import 'package:cineprime/providers/authentication_provider.dart';
@@ -60,9 +59,13 @@ class _PlansListPageState extends State<PlansListPage> {
     final user = authenticationProvider.getUser();
     return Scaffold(
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: const Text("Subscribe Now"),
+        foregroundColor: Colors.white,
+      ),
       body: SafeArea(
-        child: MembershipPageFrame(
-          child: FutureBuilder(
+        child: FutureBuilder(
           future: authenticationProvider.getPlansListAndEnabledMethods(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -89,21 +92,138 @@ class _PlansListPageState extends State<PlansListPage> {
                       : const CircularProgressIndicator(color: AppColors.colorPrimary),
                 );
               }
-              return MembershipBody(
-                plans: _plans,
-                selectedPlan: selectedPlan,
-                onSelect: (plan) => setState(() => selectedPlan = plan),
-                onContinue: () {
-                  final plan = selectedPlan;
-                  if (plan == null) return;
-                  _showPlanPopup(user, plan);
-                },
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _plans.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final plan = _plans[index];
+                        final isSelected = selectedPlan == plan;
+
+                        return GestureDetector(
+                          onTap: () async {
+                            setState(() {
+                              selectedPlan = plan;
+                            });
+                            _showPlanPopup(user, plan);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16.0),
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 8.0,
+                              horizontal: 10.0,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: isSelected
+                                  ? LinearGradient(
+                                      colors: [Colors.orange.shade400, Colors.orange.shade600],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    )
+                                  : LinearGradient(
+                                      colors: [AppColors.colorBackground, AppColors.colorBackground],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                              border: Border.all(
+                                color: isSelected ? Colors.orange : Colors.grey.shade800,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isSelected ? Colors.orange.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  plan.validity,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  "Select the perfect plan for your entertainment",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "${plan.currency}${plan.cost}",
+                                      style: const TextStyle(
+                                        fontSize: 26,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    if (plan.originalCost != null) const SizedBox(width: 10),
+                                    if (plan.originalCost != null)
+                                      Text(
+                                        "${plan.currency}${plan.originalCost}",
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          decoration: TextDecoration.lineThrough,
+                                          decorationColor: Colors.white,
+                                          decorationThickness: 2.0,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  "New web series release every week",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  "Unlimited streaming",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  "HD + (2k) Quality",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               );
             } else {
               return const PlansListPageShimmer();
             }
           },
-          ),
         ),
       ),
     );

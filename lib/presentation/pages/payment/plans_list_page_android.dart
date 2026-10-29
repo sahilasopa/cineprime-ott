@@ -18,6 +18,7 @@ import 'package:cineprime/constants/colors.dart';
 import 'package:cineprime/constants/text.dart';
 import 'package:cineprime/models/subscription_plan.dart';
 import 'package:cineprime/presentation/components/subscription/plan_card.dart';
+import 'package:cineprime/presentation/components/ui/app_widgets.dart';
 import 'package:cineprime/presentation/pages/payment/payment_failure_page.dart';
 import 'package:cineprime/presentation/pages/payment/payment_success_page.dart';
 import 'package:cineprime/providers/authentication_provider.dart';
@@ -356,8 +357,35 @@ class _PlansListPageState extends State<PlansListPage> implements PayUCheckoutPr
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: MembershipPageFrame(
-          child: FutureBuilder(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 48,
+                child: Row(
+                  children: [
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'Subscribe',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: FutureBuilder(
           future: authenticationProvider.getPlansListAndEnabledMethods(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -412,34 +440,64 @@ class _PlansListPageState extends State<PlansListPage> implements PayUCheckoutPr
                       : const CircularProgressIndicator(color: AppColors.colorPrimary),
                 );
               }
-              return MembershipBody(
-                plans: _plans,
-                selectedPlan: selectedPlan,
-                onSelect: (plan) {
-                  if (!context.mounted) return;
-                  setState(() => selectedPlan = plan);
-                },
-                onContinue: () {
-                  final plan = selectedPlan;
-                  if (plan == null) return;
-                  setState(() => selectedPlan = plan);
-                  _showPlanPopup(user, plan, null);
-                },
-                promo: PromoCodeBar(
-                  expanded: _showPromoInput,
-                  appliedCouponCode: _appliedCouponCode,
-                  couponMessage: _couponMessage,
-                  loading: _couponLoading,
-                  controller: _promoController,
-                  onExpand: () => setState(() => _showPromoInput = true),
-                  onApply: _applyPromoCode,
-                  onClear: _clearPromoCode,
-                ),
+              return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const PlansPageHeader(compact: true),
+                    const SizedBox(height: 8),
+                    PromoCodeBar(
+                      expanded: _showPromoInput,
+                      appliedCouponCode: _appliedCouponCode,
+                      couponMessage: _couponMessage,
+                      loading: _couponLoading,
+                      controller: _promoController,
+                      onExpand: () => setState(() => _showPromoInput = true),
+                      onApply: _applyPromoCode,
+                      onClear: _clearPromoCode,
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          for (var index = 0; index < _plans.length; index++) ...[
+                            if (index > 0) const SizedBox(height: 8),
+                            Expanded(
+                              child: PlanCard(
+                                compact: true,
+                                plan: _plans[index],
+                                isSelected: selectedPlan == _plans[index],
+                                onTap: () {
+                                  if (!context.mounted) return;
+                                  setState(() => selectedPlan = _plans[index]);
+                                },
+                                onSubscribe: () {},
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    GradientButton(
+                      label: 'Subscribe Now',
+                      height: 48,
+                      onPressed: selectedPlan == null
+                          ? null
+                          : () {
+                              final plan = selectedPlan!;
+                              setState(() => selectedPlan = plan);
+                              _showPlanPopup(user, plan, null);
+                            },
+                    ),
+                  ],
               );
             } else {
               return const PlansListPageShimmer();
             }
           },
+                ),
+              ),
+            ],
           ),
         ),
       ),

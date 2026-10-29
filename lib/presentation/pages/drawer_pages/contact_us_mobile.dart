@@ -158,14 +158,16 @@ class _ContactUsPageState extends State<ContactUsPage> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
+            // Keep this tree stable when the keyboard opens. Swapping between a
+            // plain box and a scroll view recreates the fields and drops focus.
             const minHeight = 560.0;
-            final scroll = constraints.maxHeight < minHeight;
-            final form = SizedBox(
-              height: scroll ? minHeight : constraints.maxHeight,
-              child: _form(contentProvider),
+            final formHeight = constraints.maxHeight < minHeight ? minHeight : constraints.maxHeight;
+            return SingleChildScrollView(
+              child: SizedBox(
+                height: formHeight,
+                child: _form(contentProvider),
+              ),
             );
-            if (!scroll) return form;
-            return SingleChildScrollView(child: form);
           },
         ),
       ),

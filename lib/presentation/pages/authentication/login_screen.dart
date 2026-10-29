@@ -173,33 +173,23 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.transparent,
       body: AppBackground(
         child: SafeArea(
-          child: Column(
-                children: [
-                  if (Navigator.of(context).canPop())
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Material(
-                          color: AppColors.colorSurface.withValues(alpha: 0.72),
-                          shape: const CircleBorder(),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (Navigator.of(context).canPop())
+                        Align(
+                          alignment: Alignment.centerLeft,
                           child: IconButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
                           ),
                         ),
-                      ),
-                    ),
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, inner) {
-                        return SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(minHeight: inner.maxHeight - 24),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
                       Image.asset('assets/images/cineprime-logo.png', height: 108),
                       const SizedBox(height: 28),
                       const Text(
@@ -441,15 +431,12 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                       ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

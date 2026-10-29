@@ -1,13 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:cineprime/constants/app_theme.dart';
 import 'package:cineprime/constants/colors.dart';
 import 'package:cineprime/platform_utils.dart';
 import 'package:cineprime/presentation/components/media/media_tile.dart';
-import 'package:cineprime/presentation/components/ui/app_widgets.dart';
 import 'package:cineprime/presentation/pages/drawer_pages/notifications_page.dart';
-import 'package:cineprime/presentation/pages/fragments/search_page.dart';
 import 'package:cineprime/providers/content_provider.dart';
 import 'package:cineprime/providers/in_app_notification_provider.dart';
 import 'package:provider/provider.dart';
@@ -479,21 +476,13 @@ class _SectionsPageState extends State<SectionsPage> with WidgetsBindingObserver
                       ShimmerTile(),
                     ])
                   else
-                    Builder(
-                      builder: (context) {
-                        final sections = _filteredSections(contentProvider);
-                        final poster = _posterSize(MediaQuery.sizeOf(context).width, _matchingPosterType(sections));
-                        return Column(
-                          children: sections.map((section) {
-                            return Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              child: _isContinueSection(section)
-                                  ? _HomeContinueRow(section: section, poster: poster)
-                                  : MediaTile(section),
-                            );
-                          }).toList(),
+                    Column(
+                      children: _filteredSections(contentProvider).map((section) {
+                        return Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          child: MediaTile(section),
                         );
-                      },
+                      }).toList(),
                     ),
                   SizedBox(height: 72),
                   if (PlatformUtils.isWeb) FooterWithBadges(),
@@ -501,229 +490,6 @@ class _SectionsPageState extends State<SectionsPage> with WidgetsBindingObserver
               ),
             ),
             ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-bool _isContinueSection(Section section) =>
-    section.isContinueWatching || section.title.toLowerCase().contains('continue');
-
-/// Poster frame used by the other home rows, so Continue Watching lines up with them.
-String _matchingPosterType(Iterable<Section> sections) {
-  const portrait = {'vertical', 'vertical_large', 'vertical_small', 'square_small'};
-  for (final section in sections) {
-    if (_isContinueSection(section)) continue;
-    if (portrait.contains(section.type)) return section.type;
-  }
-  return 'vertical_small';
-}
-
-class _PosterSize {
-  final double width;
-  final double height;
-
-  const _PosterSize(this.width, this.height);
-}
-
-_PosterSize _posterSize(double screenWidth, String type) {
-  const inset = 4.0;
-  final double slot;
-  final double ratio;
-  switch (type) {
-    case 'vertical_large':
-      slot = screenWidth / 2;
-      ratio = 3 / 2;
-    case 'vertical':
-      slot = screenWidth / 2.5;
-      ratio = 3 / 2;
-    case 'square_small':
-      slot = screenWidth / 3;
-      ratio = 1;
-    default:
-      slot = screenWidth / 3;
-      ratio = 3 / 2;
-  }
-  final width = slot - inset * 2;
-  return _PosterSize(width, width * ratio);
-}
-
-/// My List continue-watching cards, laid out as a home row.
-class _HomeContinueRow extends StatelessWidget {
-  final Section section;
-  final _PosterSize poster;
-
-  const _HomeContinueRow({required this.section, required this.poster});
-
-  @override
-  Widget build(BuildContext context) {
-    final items = section.baseItems.length > 10 ? section.baseItems.sublist(0, 10) : section.baseItems;
-    const textWidth = 136.0;
-    const innerGap = 10.0;
-    final cardWidth = poster.width + innerGap + textWidth;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 6),
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Text(
-                    section.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 17.0,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => SearchPage(section: section),
-                  ));
-                },
-                child: const Padding(
-                  padding: EdgeInsets.only(right: 16),
-                  child: Text(
-                    'See All',
-                    style: TextStyle(
-                      color: Color(0xFF6B7280),
-                      fontSize: 13.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: poster.height,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
-            itemBuilder: (context, index) {
-              return _ContinueInfoCard(
-                item: items[index],
-                poster: poster,
-                width: cardWidth,
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ContinueInfoCard extends StatelessWidget {
-  final BaseItem item;
-  final _PosterSize poster;
-  final double width;
-
-  const _ContinueInfoCard({
-    required this.item,
-    required this.poster,
-    required this.width,
-  });
-
-  String get _posterUrl {
-    if (item.verticalPosterUrl.isNotEmpty) return item.verticalPosterUrl;
-    if (item.squarePosterUrl.isNotEmpty) return item.squarePosterUrl;
-    return item.horizontalPosterUrl;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final meta = mediaMetaLine(item);
-    final description = item.description.trim();
-
-    return GestureDetector(
-      onTap: () => showBottomSheetOrNavigate(context, item),
-      child: SizedBox(
-        width: width,
-        height: poster.height,
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: SizedBox(
-                width: poster.width,
-                height: poster.height,
-                child: _posterUrl.isEmpty
-                    ? const ColoredBox(
-                        color: Color(0xFF1F1F1F),
-                        child: Icon(Icons.movie_outlined, color: Colors.white54),
-                      )
-                    : CachedNetworkImage(
-                        imageUrl: _posterUrl,
-                        fit: BoxFit.cover,
-                        fadeInDuration: Duration.zero,
-                        placeholder: (_, __) => const ColoredBox(color: Color(0xFF1F1F1F)),
-                        errorWidget: (_, __, ___) => const ColoredBox(
-                          color: Color(0xFF1F1F1F),
-                          child: Icon(Icons.movie_outlined, color: Colors.white54),
-                        ),
-                      ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    item.title.isEmpty ? 'Untitled' : item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      height: 1.2,
-                    ),
-                  ),
-                  if (meta.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      meta,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.meta,
-                    ),
-                  ],
-                  if (description.isNotEmpty)
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          description,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.colorTextSecondary,
-                            fontSize: 13,
-                            height: 1.35,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
             ),
           ],
         ),

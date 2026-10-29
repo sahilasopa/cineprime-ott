@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
+import 'package:cineprime/constants/colors.dart';
+import 'package:cineprime/presentation/components/subscription/plan_card.dart';
+
 class PlansListPageShimmer extends StatelessWidget {
   const PlansListPageShimmer({super.key});
 
@@ -9,93 +12,85 @@ class PlansListPageShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: _shimmerBase,
-      highlightColor: _shimmerHighlight,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 14),
-          _block(width: 156, height: 28),
-          const SizedBox(height: 10),
-          _block(width: 168, height: 14),
-          const SizedBox(height: 16),
-          _block(width: 240, height: 12),
+          const PlansPageHeader(),
           const SizedBox(height: 18),
-          Expanded(
+          Shimmer.fromColors(
+            baseColor: _shimmerBase,
+            highlightColor: _shimmerHighlight,
             child: Column(
               children: [
-                _card(),
-                const SizedBox(height: 10),
-                _card(),
-                const SizedBox(height: 10),
-                _card(),
+                _ticket(),
+                const SizedBox(height: 14),
+                _ticket(),
+                const SizedBox(height: 14),
+                _ticket(),
               ],
             ),
-          ),
-          const SizedBox(height: 8),
-          _block(width: 110, height: 14),
-          const SizedBox(height: 12),
-          Container(
-            height: 52,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: _shimmerBase,
-              borderRadius: BorderRadius.circular(28),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Align(
-            alignment: Alignment.center,
-            child: _block(width: 96, height: 10),
           ),
         ],
       ),
     );
   }
 
-  Widget _block({required double width, required double height}) {
+  Widget _ticket() {
     return Container(
-      width: width,
-      height: height,
+      height: 108,
       decoration: BoxDecoration(
-        color: _shimmerBase,
-        borderRadius: BorderRadius.circular(8),
-      ),
-    );
-  }
-
-  Widget _card() {
-    return Container(
-      height: 76,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: _shimmerBase,
-        borderRadius: BorderRadius.circular(18),
+        color: AppColors.colorSurface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.colorInputBorder),
       ),
       child: Row(
         children: [
           Container(
-            width: 20,
-            height: 20,
+            width: 78,
             decoration: const BoxDecoration(
-              color: Color(0xFF242430),
-              shape: BoxShape.circle,
+              color: _shimmerBase,
+              borderRadius: BorderRadius.horizontal(left: Radius.circular(19)),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _block(width: 120, height: 14),
-                const SizedBox(height: 8),
-                _block(width: 72, height: 10),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 14,
+                    width: 140,
+                    decoration: BoxDecoration(
+                      color: _shimmerBase,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 10,
+                    width: 90,
+                    decoration: BoxDecoration(
+                      color: _shimmerBase,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    height: 18,
+                    width: 72,
+                    decoration: BoxDecoration(
+                      color: _shimmerBase,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          _block(width: 56, height: 16),
         ],
       ),
     );

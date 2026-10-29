@@ -31,12 +31,6 @@ class DownloadProvider extends ChangeNotifier {
     _showChildSafe = value == 'true';
   }
 
-  void applyChildSafe(bool value) {
-    if (_showChildSafe == value) return;
-    _showChildSafe = value;
-    notifyListeners();
-  }
-
   final Dio dio = Dio();
   final Map<String, DownloadItemWrapper> _downloads = {};
   final mediaService = MediaService.instance;
